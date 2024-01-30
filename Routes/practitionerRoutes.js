@@ -202,4 +202,34 @@ practitionerRouter.get(
   })
 );
 
+//UPDATE PRACTITIONER PROFILE
+practitionerRouter.patch(
+  "/profile",
+  protectPractitioner,
+  asyncHandler(async (req, res) => {
+    const practitioner = await Practitioner.findById(req.user._id);
+
+    if (practitioner) {
+      practitioner.email = req.body.email || practitioner.email;
+      practitioner.firstName = req.body.firstName || practitioner.firstName;
+      practitioner.lastName = req.body.lastName || practitioner.lastName;
+      practitioner.workAddress =
+        req.body.workAddress || practitioner.workAddress;
+      practitioner.workPhoneNumber =
+        req.body.workPhoneNumber || practitioner.workPhoneNumber;
+      practitioner.email = req.body.email || practitioner.email;
+      if (req.body.password) {
+        practitioner.password = req.body.password;
+      }
+      const updatedPractitioner = await practitioner.save();
+      res.json({
+        updatedPractitioner,
+      });
+    } else {
+      res.status(404);
+      throw new Error("User not found");
+    }
+  })
+);
+
 export default practitionerRouter;
