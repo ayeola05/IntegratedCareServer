@@ -3,7 +3,7 @@ import asyncHandler from "express-async-handler";
 import Patient from "../Models/PatientModel.js";
 import ID from "nodejs-unique-numeric-id-generator";
 import generateToken from "../utils/generateToken.js";
-import { protect } from "../Middleware /AuthMiddleware.js";
+import { protectPatient } from "../Middleware /AuthMiddleware.js";
 import mailer from "../config/EmailService.js";
 import jwt from "jsonwebtoken";
 
@@ -37,10 +37,7 @@ patientRouter.post(
 
     if (patient) {
       res.status(201).json({
-        patientId: patient.patientId,
-        firstName: patient.firstName,
-        lastName: patient.lastName,
-        email: patient.email,
+        message: "success",
       });
       //TODO:Correct the url on deployment
       const confirmationUrl = "localhost:3000/api/patient/confirmation";
@@ -64,48 +61,18 @@ patientRouter.post(
       throw new Error("Invalid Email or Password");
     }
 
-    if (!patient.confirmed) {
-      throw new Error("Please confirm your email to login");
-    }
-
     if (patient && (await patient.matchPassword(password))) {
       res.json({
         patientId: patient.patientId,
         firstName: patient.firstName,
         lastName: patient.lastName,
         email: patient.email,
+        confirmed: patient.confirmed,
         token: generateToken(patient._id),
       });
     } else {
       res.status(401);
       throw new Error("Invalid Email or Password");
-    }
-  })
-);
-
-//GET PATIENT BY PATIENT ID
-patientRouter.get(
-  "/",
-  protect,
-  asyncHandler(async (req, res) => {
-    const patientId = req.query.patientId;
-    if (!patientId) {
-      res.status(400);
-      throw new Error("Provide a valid patient id");
-    }
-
-    const patient = await Patient.findOne({ patientId });
-
-    if (patient) {
-      res.json({
-        patientId: patient.patientId,
-        firstName: patient.firstName,
-        lastName: patient.lastName,
-        email: patient.email,
-      });
-    } else {
-      res.status(400);
-      throw new Error("Patient does not exist");
     }
   })
 );
@@ -119,10 +86,73 @@ patientRouter.get(
     if (patient) {
       patient.confirmed = true;
       const confirmedPatient = await patient.save();
-      res.json(confirmedPatient);
+      res.json({
+        message: "account verified",
+        email: confirmedPatient.email,
+      });
     } else {
       res.status(404);
       throw new Error("Patient not found");
+    }
+  })
+);
+
+//GET PATIENT PROFILE
+patientRouter.get(
+  "/",
+  protectPatient,
+  asyncHandler(async (req, res) => {
+    const patient = await Patient.findById(req.user._id);
+
+    if (patient) {
+      res.json({
+        patientId: patient.patientId,
+        firstName: patient.firstName,
+        lastName: patient.lastName,
+        email: patient.email,
+        confirmed: patient.confirmed,
+      });
+    } else {
+      res.status(404);
+      throw new Error("Patient not found");
+    }
+  })
+);
+
+//UPDATE PATIENT PROFILE
+patientRouter.patch(
+  "/profile",
+  protectPatient,
+  asyncHandler(async (req, res) => {
+    const patient = await Patient.findById(req.user._id);
+
+    if (patient) {
+      patient.email = req.body.email || patient.email;
+      patient.firstName = req.body.firstName || patient.firstName;
+      patient.lastName = req.body.lastName || patient.lastName;
+      patient.dob = req.body.dob || patient.dob;
+      patient.age = req.body.age || patient.age;
+      patient.location = req.body.location || patient.location;
+      patient.occupation = req.body.occupation || patient.occupation;
+      patient.gender = req.body.gender || patient.gender;
+      patient.maritalStatus = req.body.maritalStatus || patient.maritalStatus;
+      patient.address = req.body.address || patient.address;
+      patient.phoneNumber = req.body.phoneNumber || patient.phoneNumber;
+      patient.nextOfKin = req.body.nextOfKin || patient.nextOfKin;
+      patient.relationshipWithNextOfKin =
+        req.body.relationshipWithNextOfKin || patient.relationshipWithNextOfKin;
+      patient.contactOfNextOfKin =
+        req.body.contactOfNextOfKin || patient.contactOfNextOfKin;
+      if (req.body.password) {
+        patient.password = req.body.password;
+      }
+      const updatedPatient = await patient.save();
+      res.json({
+        updatedPatient,
+      });
+    } else {
+      res.status(404);
+      throw new Error("User not found");
     }
   })
 );

@@ -1,8 +1,12 @@
 import express from "express";
 import asyncHandler from "express-async-handler";
 import Practitioner from "../Models/HealthCareProviderModel.js";
+import Patient from "../Models/PatientModel.js";
 import generateToken from "../utils/generateToken.js";
-import { protect } from "../Middleware /AuthMiddleware.js";
+import {
+  isPractitIoner,
+  protectPractitioner,
+} from "../Middleware /AuthMiddleware.js";
 import mailer from "../config/EmailService.js";
 import jwt from "jsonwebtoken";
 
@@ -48,13 +52,7 @@ practitionerRouter.post(
 
     if (practitioner) {
       res.status(201).json({
-        firstName: practitioner.firstName,
-        lastName: practitioner.lastName,
-        registrationNumber: practitioner.registrationNumber,
-        specialty: practitioner.specialty,
-        workAddress: practitioner.workAddress,
-        workPhoneNumber: practitioner.workPhoneNumber,
-        email: practitioner.email,
+        message: "success",
       });
       //TODO: Correct the url on deployment
       const confirmationUrl = "localhost:3000/api/practitioner/confirmation";
@@ -78,10 +76,6 @@ practitionerRouter.post(
       throw new Error("Invalid Email or Password");
     }
 
-    if (!practitioner.confirmed) {
-      throw new Error("Please confirm your email to login");
-    }
-
     if (practitioner && (await practitioner.matchPassword(password))) {
       res.json({
         firstName: practitioner.firstName,
@@ -91,6 +85,7 @@ practitionerRouter.post(
         workAddress: practitioner.workAddress,
         workPhoneNumber: practitioner.workPhoneNumber,
         email: practitioner.email,
+        confirmed: practitioner.confirmed,
         token: generateToken(practitioner._id),
       });
     } else {
@@ -100,9 +95,40 @@ practitionerRouter.post(
   })
 );
 
+//PRACTITIONER SHOULD ABLE TO GET A PATIENT BY ID
 practitionerRouter.get(
-  "/",
-  protect,
+  "/getPatient",
+  protectPractitioner,
+  isPractitIoner,
+  asyncHandler(async (req, res) => {
+    console.log(req.user);
+    const patientId = req.query.patientId;
+    if (!patientId) {
+      res.status(400);
+      throw new Error("Provide a valid patient id");
+    }
+
+    const patient = await Patient.findOne({ patientId });
+
+    if (patient) {
+      res.json({
+        patientId: patient.patientId,
+        firstName: patient.firstName,
+        lastName: patient.lastName,
+        email: patient.email,
+      });
+    } else {
+      res.status(400);
+      throw new Error("Patient does not exist");
+    }
+  })
+);
+
+//GET ANOTHER PRACTITIONER BY EMAIL
+practitionerRouter.get(
+  "/getPractitioner",
+  protectPractitioner,
+  isPractitIoner,
   asyncHandler(async (req, res) => {
     const email = req.query.email;
     if (!email) {
@@ -144,6 +170,31 @@ practitionerRouter.get(
       practitioner.confirmed = true;
       const confirmedPractitioner = await practitioner.save();
       res.json(confirmedPractitioner);
+    } else {
+      res.status(404);
+      throw new Error("Practitioner not found");
+    }
+  })
+);
+
+//GET PROFILE
+practitionerRouter.get(
+  "/",
+  protectPractitioner,
+  asyncHandler(async (req, res) => {
+    const practitioner = await Practitioner.findById(req.user._id);
+
+    if (practitioner) {
+      res.json({
+        firstName: practitioner.firstName,
+        lastName: practitioner.lastName,
+        registrationNumber: practitioner.registrationNumber,
+        specialty: practitioner.specialty,
+        workAddress: practitioner.workAddress,
+        workPhoneNumber: practitioner.workPhoneNumber,
+        email: practitioner.email,
+        confirmed: practitioner.confirmed,
+      });
     } else {
       res.status(404);
       throw new Error("Practitioner not found");
