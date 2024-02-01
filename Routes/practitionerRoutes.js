@@ -11,6 +11,7 @@ import mailer from "../config/EmailService.js";
 import jwt from "jsonwebtoken";
 
 const practitionerRouter = express.Router();
+const BASE_URL = "https://integrated-server.onrender.com";
 
 //PRACTITIONER REGISTRATION
 practitionerRouter.post(
@@ -54,8 +55,7 @@ practitionerRouter.post(
       res.status(201).json({
         message: "success",
       });
-      //TODO: Correct the url on deployment
-      const confirmationUrl = "localhost:3000/api/practitioner/confirmation";
+      const confirmationUrl = `${BASE_URL}/api/practitioner/confirmation`;
       mailer(practitioner, confirmationUrl);
     } else {
       res.status(400);

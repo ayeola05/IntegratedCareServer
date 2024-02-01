@@ -9,6 +9,8 @@ import jwt from "jsonwebtoken";
 
 const patientRouter = express.Router();
 
+const BASE_URL = "https://integrated-server.onrender.com";
+
 //PATIENTS REGISTRATION
 patientRouter.post(
   "/",
@@ -39,8 +41,7 @@ patientRouter.post(
       res.status(201).json({
         message: "success",
       });
-      //TODO:Correct the url on deployment
-      const confirmationUrl = "localhost:3000/api/patient/confirmation";
+      const confirmationUrl = `${BASE_URL}/api/patient/confirmation`;
       mailer(patient, confirmationUrl);
     } else {
       res.status(400);
