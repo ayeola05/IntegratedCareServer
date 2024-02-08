@@ -24,7 +24,7 @@ const mailer = async ({ _id, email }, confirmationUrl) => {
       },
       to: email,
       subject: "Confirm Mail",
-      html: `Please click this email to confirm your email: <a href="${url}">${url}</a>`,
+      html: `<h1>Welcome to Integrated Care</h1> Please click this link to confirm your email: <a href="${url}">Confirm Email</a> <p>We can't wait to have you onboard</p>`,
     });
   } catch (e) {
     console.log(e);

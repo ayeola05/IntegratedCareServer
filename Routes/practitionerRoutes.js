@@ -101,7 +101,6 @@ practitionerRouter.get(
   protectPractitioner,
   isPractitIoner,
   asyncHandler(async (req, res) => {
-    console.log(req.user);
     const patientId = req.query.patientId;
     if (!patientId) {
       res.status(400);
