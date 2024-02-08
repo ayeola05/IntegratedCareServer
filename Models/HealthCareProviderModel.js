@@ -14,7 +14,7 @@ const practitionerSchema = mongoose.Schema(
       required: true,
     },
     registrationNumber: {
-      type: Number,
+      type: String,
       required: true,
       unique: true,
     },
