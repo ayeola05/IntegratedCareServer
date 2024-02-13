@@ -21,6 +21,6 @@ app.use("/api/practitioner", practitionerRouter);
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = 3000;
+const PORT = 8080;
 
 app.listen(PORT, console.log(`server is running in port ${PORT}`));

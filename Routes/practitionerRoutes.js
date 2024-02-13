@@ -123,6 +123,8 @@ practitionerRouter.get(
   })
 );
 
+//ADD PATIENT
+
 //GET ANOTHER PRACTITIONER BY EMAIL
 practitionerRouter.get(
   "/getPractitioner",
@@ -168,7 +170,9 @@ practitionerRouter.get(
     if (practitioner) {
       practitioner.confirmed = true;
       const confirmedPractitioner = await practitioner.save();
-      res.json(confirmedPractitioner);
+      res
+        .json(confirmedPractitioner)
+        .redirect("https://integratedcare.vercel.app/auth/signin");
     } else {
       res.status(404);
       throw new Error("Practitioner not found");
@@ -232,3 +236,9 @@ practitionerRouter.patch(
 );
 
 export default practitionerRouter;
+
+// await Practitioner.findByIdAndUpdate(
+//   req.user._id,
+//   { $push: { patients: patient._id } },
+//   { runValidators: true, new: true }
+// );

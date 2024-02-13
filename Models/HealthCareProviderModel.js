@@ -42,6 +42,12 @@ const practitionerSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    patients: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Patient",
+      },
+    ],
   },
   {
     timestamps: true,
@@ -65,3 +71,14 @@ practitionerSchema.methods.matchPassword = async function (enterPassword) {
 const Practitioner = mongoose.model("Practitioner", practitionerSchema);
 
 export default Practitioner;
+
+// {
+//   "email": "ayeola05@gmail.com",
+//   "password": "1234567",
+//   "firstName": "Taiwo",
+//   "lastName": "Ayeola",
+//   "registrationNumber": "123qwe",
+//   "specialty": "Big pharm",
+//   "workAddress": "World",
+//   "workPhoneNumber": "8080808080"
+//   }
