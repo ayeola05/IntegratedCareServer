@@ -169,10 +169,8 @@ practitionerRouter.get(
     const practitioner = await Practitioner.findById(id);
     if (practitioner) {
       practitioner.confirmed = true;
-      const confirmedPractitioner = await practitioner.save();
-      res
-        .json(confirmedPractitioner)
-        .redirect("https://integratedcare.vercel.app/auth/signin");
+      await practitioner.save();
+      res.redirect("https://integratedcare.vercel.app/auth/signin");
     } else {
       res.status(404);
       throw new Error("Practitioner not found");
