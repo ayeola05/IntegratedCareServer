@@ -124,6 +124,43 @@ practitionerRouter.get(
 );
 
 //ADD PATIENT
+practitionerRouter.get(
+  "/addPatient",
+  protectPractitioner,
+  isPractitIoner,
+  asyncHandler(async (req, res) => {
+    const patientId = req.query.patientId;
+
+    if (!patientId) {
+      res.status(400);
+      throw new Error("Provide a valid patient id");
+    }
+
+    const patient = await Patient.findOne({ patientId });
+
+    if (patient) {
+      const isAdded = await Practitioner.findOne({ patients: patient._id });
+
+      if (isAdded) {
+        res.status(400);
+        throw new Error("Patient already exists in dashboard");
+      }
+
+      await Practitioner.findByIdAndUpdate(
+        req.user._id,
+        {
+          $push: { patients: patient._id },
+        },
+        { runValidators: true, new: true }
+      );
+      const patients = await Practitioner.findById(req.user._id).populate(
+        "patients"
+      );
+
+      res.json(patients);
+    }
+  })
+);
 
 //GET ANOTHER PRACTITIONER BY EMAIL
 practitionerRouter.get(
