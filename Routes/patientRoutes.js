@@ -40,6 +40,7 @@ patientRouter.post(
     if (patient) {
       res.status(201).json({
         message: "success",
+        token: generateToken(patient._id),
       });
       const confirmationUrl = `${BASE_URL}/api/patient/confirmation`;
       mailer(patient, confirmationUrl);
@@ -90,6 +91,26 @@ patientRouter.get(
       res.json({
         message: "account verified",
         email: confirmedPatient.email,
+      });
+    } else {
+      res.status(404);
+      throw new Error("Patient not found");
+    }
+  })
+);
+
+//RESEND CONFIRMATION MAIL
+patientRouter.post(
+  "/resendConfirmation/:token",
+  asyncHandler(async (req, res) => {
+    const { id } = jwt.verify(req.params.token, process.env.JWT_SECRET);
+    const patient = await Patient.findById(id);
+    if (patient) {
+      const confirmationUrl = `${BASE_URL}/api/
+      patient/confirmation`;
+      mailer(patient, confirmationUrl);
+      res.json({
+        message: "email sent",
       });
     } else {
       res.status(404);
