@@ -100,24 +100,24 @@ patientRouter.get(
 );
 
 //RESEND CONFIRMATION MAIL
-patientRouter.post(
-  "/resendConfirmation/:token",
-  asyncHandler(async (req, res) => {
-    const { id } = jwt.verify(req.params.token, process.env.JWT_SECRET);
-    const patient = await Patient.findById(id);
-    if (patient) {
-      const confirmationUrl = `${BASE_URL}/api/
-      patient/confirmation`;
-      mailer(patient, confirmationUrl);
-      res.json({
-        message: "email sent",
-      });
-    } else {
-      res.status(404);
-      throw new Error("Patient not found");
-    }
-  })
-);
+// patientRouter.post(
+//   "/resendConfirmation/:token",
+//   asyncHandler(async (req, res) => {
+//     const { id } = jwt.verify(req.params.token, process.env.JWT_SECRET);
+//     const patient = await Patient.findById(id);
+//     if (patient) {
+//       const confirmationUrl = `${BASE_URL}/api/
+//       patient/confirmation`;
+//       mailer(patient, confirmationUrl);
+//       res.json({
+//         message: "email sent",
+//       });
+//     } else {
+//       res.status(404);
+//       throw new Error("Patient not found");
+//     }
+//   })
+// );
 
 //GET PATIENT PROFILE
 patientRouter.get(

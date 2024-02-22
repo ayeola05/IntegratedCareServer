@@ -224,6 +224,12 @@ practitionerRouter.get(
   asyncHandler(async (req, res) => {
     const practitioner = await Practitioner.findById(req.user._id);
 
+    // const patients = await Practitioner.findById(req.user._id).populate(
+    //   "patients"
+    // );
+
+    const { patients } = await practitioner.populate("patients");
+
     if (practitioner) {
       res.json({
         firstName: practitioner.firstName,
@@ -234,6 +240,7 @@ practitionerRouter.get(
         workPhoneNumber: practitioner.workPhoneNumber,
         email: practitioner.email,
         confirmed: practitioner.confirmed,
+        patients,
       });
     } else {
       res.status(404);

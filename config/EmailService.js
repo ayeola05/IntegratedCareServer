@@ -15,8 +15,8 @@ const transporter = nodemailer.createTransport({
 const mailer = async ({ _id, email }, confirmationUrl) => {
   try {
     const emailToken = generateToken(_id);
-    const url = `${confirmationUrl}/${emailToken}`;
-
+    const url = `${confirmationUrl}/${emailToken}
+    `;
     await transporter.sendMail({
       from: {
         name: "Integrated Care",
@@ -26,6 +26,8 @@ const mailer = async ({ _id, email }, confirmationUrl) => {
       subject: "Confirm Mail",
       html: `<h1>Welcome to Integrated Care</h1> Please click this link to confirm your email: <a href="${url}">Confirm Email</a> <p>We can't wait to have you onboard</p>`,
     });
+
+    console.log(url);
   } catch (e) {
     console.log(e);
   }
