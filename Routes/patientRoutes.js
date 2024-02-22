@@ -6,6 +6,7 @@ import generateToken from "../utils/generateToken.js";
 import { protectPatient } from "../Middleware /AuthMiddleware.js";
 import mailer from "../config/EmailService.js";
 import jwt from "jsonwebtoken";
+import Encounter from "../Models/EncounterModel.js";
 
 const patientRouter = express.Router();
 
@@ -175,6 +176,23 @@ patientRouter.patch(
     } else {
       res.status(404);
       throw new Error("User not found");
+    }
+  })
+);
+
+patientRouter.get(
+  "/medicalHistory",
+  protectPatient,
+  asyncHandler(async (req, res) => {
+    const patient = await Patient.findById(req.user._id);
+
+    if (patient) {
+      const medicalHistory = await Encounter.find({ patientId: patient._id });
+
+      res.json(medicalHistory);
+    } else {
+      res.status(404);
+      throw new Error("Patient history not found");
     }
   })
 );

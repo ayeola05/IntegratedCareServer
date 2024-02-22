@@ -4,11 +4,12 @@ import Practitioner from "../Models/HealthCareProviderModel.js";
 import Patient from "../Models/PatientModel.js";
 import generateToken from "../utils/generateToken.js";
 import {
-  isPractitIoner,
+  isPractitioner,
   protectPractitioner,
 } from "../Middleware /AuthMiddleware.js";
 import mailer from "../config/EmailService.js";
 import jwt from "jsonwebtoken";
+import Encounter from "../Models/EncounterModel.js";
 
 const practitionerRouter = express.Router();
 const BASE_URL = "https://integrated-server.onrender.com";
@@ -99,7 +100,7 @@ practitionerRouter.post(
 practitionerRouter.get(
   "/getPatient",
   protectPractitioner,
-  isPractitIoner,
+  isPractitioner,
   asyncHandler(async (req, res) => {
     const patientId = req.query.patientId;
     if (!patientId) {
@@ -127,7 +128,7 @@ practitionerRouter.get(
 practitionerRouter.get(
   "/addPatient",
   protectPractitioner,
-  isPractitIoner,
+  isPractitioner,
   asyncHandler(async (req, res) => {
     const patientId = req.query.patientId;
 
@@ -166,7 +167,7 @@ practitionerRouter.get(
 practitionerRouter.get(
   "/getPractitioner",
   protectPractitioner,
-  isPractitIoner,
+  isPractitioner,
   asyncHandler(async (req, res) => {
     const email = req.query.email;
     if (!email) {
@@ -271,6 +272,207 @@ practitionerRouter.patch(
     } else {
       res.status(404);
       throw new Error("User not found");
+    }
+  })
+);
+
+//ADD AN ENCOUNTER
+practitionerRouter.post(
+  "/addEncounter/:patientId",
+  protectPractitioner,
+  isPractitioner,
+  asyncHandler(async (req, res) => {
+    const { location, reasonForVisit } = req.body;
+
+    const patientId = req.params.patientId;
+
+    const practitioner = await Practitioner.findById(req.user._id);
+
+    if (!practitioner) {
+      res.status(404);
+      throw new Error("Practitioner not found");
+    }
+
+    const patient = await Patient.findOne({ patientId });
+
+    if (!patient) {
+      res.status(404);
+      throw new Error("Patient not found");
+    }
+
+    const encounter = await Encounter.create({
+      patientId: patient._id,
+      practitionerId: practitioner._id,
+      location,
+      reasonForVisit,
+    });
+
+    if (encounter) {
+      res.status(201).json(encounter);
+    } else {
+      res.status(400);
+      throw new Error("Invalid Data");
+    }
+  })
+);
+
+//ADD TASK
+practitionerRouter.post(
+  "/addTask/:encounterId",
+  protectPractitioner,
+  isPractitioner,
+  asyncHandler(async (req, res) => {
+    const encounterId = req.params.encounterId;
+
+    const { taskName } = req.body;
+
+    const encounter = await Encounter.findById(encounterId);
+
+    if (!encounter) {
+      res.status(404);
+      throw new Error("Patient encounter not found");
+    }
+
+    const task = {
+      taskName,
+    };
+
+    const updatedEncounter = await Encounter.findByIdAndUpdate(
+      encounterId,
+      {
+        $push: { task },
+      },
+      { runValidators: true, new: true }
+    );
+
+    if (updatedEncounter) {
+      res.status(201).json(updatedEncounter);
+    } else {
+      res.status(400);
+      throw new Error("Invalid Data");
+    }
+  })
+);
+
+practitionerRouter.post(
+  "/addDiagnosis/:encounterId",
+  protectPractitioner,
+  isPractitioner,
+  asyncHandler(async (req, res) => {
+    const encounterId = req.params.encounterId;
+
+    const { description } = req.body;
+
+    const encounter = await Encounter.findById(encounterId);
+
+    if (!encounter) {
+      res.status(404);
+      throw new Error("Patient encounter not found");
+    }
+
+    const diagnosis = {
+      description,
+    };
+
+    const updatedEncounter = await Encounter.findByIdAndUpdate(
+      encounterId,
+      {
+        $push: { diagnosis },
+      },
+      { runValidators: true, new: true }
+    );
+
+    if (updatedEncounter) {
+      res.status(201).json(updatedEncounter);
+    } else {
+      res.status(400);
+      throw new Error("Invalid Data");
+    }
+  })
+);
+
+practitionerRouter.post(
+  "/addMedication/:encounterId",
+  protectPractitioner,
+  isPractitioner,
+  asyncHandler(async (req, res) => {
+    const encounterId = req.params.encounterId;
+
+    const {
+      drugName,
+      dosage,
+      frequency
+    } = req.body;
+
+    const encounter = await Encounter.findById(encounterId);
+
+    if (!encounter) {
+      res.status(404);
+      throw new Error("Patient encounter not found");
+    }
+
+    const medication = {
+      drugName,
+      dosage,
+      frequency
+    };
+
+    const updatedEncounter = await Encounter.findByIdAndUpdate(
+      encounterId,
+      {
+        $push: { medication },
+      },
+      { runValidators: true, new: true }
+    );
+
+    if (updatedEncounter) {
+      res.status(201).json(updatedEncounter);
+    } else {
+      res.status(400);
+      throw new Error("Invalid Data");
+    }
+  })
+);
+
+practitionerRouter.post(
+  "/addAllergy/:encounterId",
+  protectPractitioner,
+  isPractitioner,
+  asyncHandler(async (req, res) => {
+    const encounterId = req.params.encounterId;
+
+    const {
+      allergen,
+      reaction,
+      severity
+    } = req.body;
+
+    const encounter = await Encounter.findById(encounterId);
+
+    if (!encounter) {
+      res.status(404);
+      throw new Error("Patient encounter not found");
+    }
+
+    const allergy = {
+      allergen,
+      reaction,
+      severity 
+    };
+
+    const updatedEncounter = await Encounter.findByIdAndUpdate(
+      encounterId,
+      {
+        $push: { allergies: allergy },
+      },
+      { runValidators: true, new: true }
+    );
+
+    if (updatedEncounter) {
+      res.status(201).json(updatedEncounter);
+    } else {
+      res.status(400);
+      throw new Error("Invalid Data");
     }
   })
 );

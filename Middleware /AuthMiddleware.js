@@ -55,7 +55,7 @@ const protectPractitioner = asyncHandler(async (req, res, next) => {
   }
 });
 
-const isPractitIoner = (req, res, next) => {
+const isPractitioner = (req, res, next) => {
   if (req.user && req.user.registrationNumber) {
     next();
   } else {
@@ -64,4 +64,4 @@ const isPractitIoner = (req, res, next) => {
   }
 };
 
-export { isPractitIoner, protectPatient, protectPractitioner };
+export { isPractitioner, protectPatient, protectPractitioner };

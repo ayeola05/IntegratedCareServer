@@ -3,7 +3,7 @@ import { ProcedureSchema } from "./ProcedureModel.js";
 import { AllergiesSchema } from "./AllergiesModel.js";
 import { DiagnosisSchema } from "./DiagnosisModel.js";
 import { MedicationSchema } from "./MedicationSchema.js";
-import { TestSchema } from "./TestModel.js";
+import { TaskSchema } from "./TaskModel.js";
 
 const EncounterSchema = mongoose.Schema(
   {
@@ -25,11 +25,11 @@ const EncounterSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    procedures: [ProcedureSchema],
+    // procedures: [ProcedureSchema],
     allergies: [AllergiesSchema],
     diagnosis: [DiagnosisSchema],
-    medications: [MedicationSchema],
-    tests: [TestSchema],
+    medication: [MedicationSchema],
+    task: [TaskSchema],
   },
   {
     timestamps: true,
