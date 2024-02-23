@@ -10,6 +10,7 @@ import {
 import mailer from "../config/EmailService.js";
 import jwt from "jsonwebtoken";
 import Encounter from "../Models/EncounterModel.js";
+import Allergies from "../Models/AllergiesModel.js";
 
 const practitionerRouter = express.Router();
 const BASE_URL = "https://integrated-server.onrender.com";
@@ -258,7 +259,7 @@ practitionerRouter.patch(
       practitioner.firstName = req.body.firstName || practitioner.firstName;
       practitioner.lastName = req.body.lastName || practitioner.lastName;
       practitioner.workAddress =
-        req.body.workAddress || practitioner.workAddress;
+        req.body.workAddress || practitioneupdatedEncounterr.workAddress;
       practitioner.workPhoneNumber =
         req.body.workPhoneNumber || practitioner.workPhoneNumber;
       practitioner.email = req.body.email || practitioner.email;
@@ -440,41 +441,78 @@ practitionerRouter.post(
   })
 );
 
+// practitionerRouter.post(
+//   "/addAllergy/:encounterId",
+//   protectPractitioner,
+//   isPractitioner,
+//   asyncHandler(async (req, res) => {
+//     const encounterId = req.params.encounterId;
+
+//     const { allergen, reaction, severity } = req.body;
+
+//     const encounter = await Encounter.findById(encounterId);
+
+//     if (!encounter) {
+//       res.status(404);
+//       throw new Error("Patient encounter not found");
+//     }
+
+//     const allergy = {
+//       allergen,
+//       reaction,
+//       severity,
+//     };
+
+//     const updatedEncounter = await Encounter.findByIdAndUpdate(
+//       encounterId,
+//       {
+//         $push: { allergies: allergy },
+//       },
+//       { runValidators: true, new: true }
+//     );
+
+//     if (updatedEncounter) {
+//       const newUpdatedEncounter = await updatedEncounter.populate(
+//         "practitionerId"
+//       );
+//       res.status(201).json(newUpdatedEncounter);
+//     } else {
+//       res.status(400);
+//       throw new Error("Invalid Data");
+//     }
+//   })
+// );
+
 practitionerRouter.post(
-  "/addAllergy/:encounterId",
+  "/addAllergy/:patientId",
   protectPractitioner,
   isPractitioner,
   asyncHandler(async (req, res) => {
-    const encounterId = req.params.encounterId;
-
     const { allergen, reaction, severity } = req.body;
 
-    const encounter = await Encounter.findById(encounterId);
+    const patientId = req.params.patientId;
 
-    if (!encounter) {
+    const patient = await Patient.findOne({ patientId });
+
+    if (!patient) {
       res.status(404);
       throw new Error("Patient encounter not found");
     }
 
-    const allergy = {
+    const newAllergy = await Allergies.create({
       allergen,
       reaction,
       severity,
-    };
+      patientId: patient._id,
+      practitionerId: req.user._id,
+    });
 
-    const updatedEncounter = await Encounter.findByIdAndUpdate(
-      encounterId,
-      {
-        $push: { allergies: allergy },
-      },
-      { runValidators: true, new: true }
-    );
+    console.log(newAllergy);
 
-    if (updatedEncounter) {
-      const newUpdatedEncounter = await updatedEncounter.populate(
-        "practitionerId"
-      );
-      res.status(201).json(newUpdatedEncounter);
+    const populatedAllergy = await newAllergy.populate("practitionerId");
+
+    if (newAllergy) {
+      res.status(201).json(populatedAllergy);
     } else {
       res.status(400);
       throw new Error("Invalid Data");

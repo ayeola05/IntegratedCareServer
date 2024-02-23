@@ -2,6 +2,16 @@ import mongoose from "mongoose";
 
 export const AllergiesSchema = mongoose.Schema(
   {
+    patientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "Patient",
+    },
+    practitionerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "Practitioner",
+    },
     allergen: {
       type: String,
       required: true,
