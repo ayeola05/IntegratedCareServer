@@ -80,6 +80,11 @@ patientRouter.post(
   })
 );
 
+const handleRedirect = (req, res) => {
+  const targetUrl = "https://integrated-care.vercel.app/auth/sign-in";
+  res.redirect(targetUrl);
+};
+
 //EMAIL CONFIRMATION
 patientRouter.get(
   "/confirmation/:token",
@@ -89,7 +94,7 @@ patientRouter.get(
     if (patient) {
       patient.confirmed = true;
       const confirmedPatient = await patient.save();
-      res.redirect("/https://integrated-care.vercel.app/auth/sign-in");
+      handleRedirect;
       // .json({
       //   message: "account verified",
       //   email: confirmedPatient.email,
