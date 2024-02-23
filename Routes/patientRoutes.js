@@ -187,7 +187,9 @@ patientRouter.get(
     const patient = await Patient.findById(req.user._id);
 
     if (patient) {
-      const medicalHistory = await Encounter.find({ patientId: patient._id });
+      const medicalHistory = await Encounter.find({
+        patientId: patient._id,
+      }).populate("practitionerId");
 
       res.json(medicalHistory);
     } else {

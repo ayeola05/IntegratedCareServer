@@ -398,11 +398,7 @@ practitionerRouter.post(
   asyncHandler(async (req, res) => {
     const encounterId = req.params.encounterId;
 
-    const {
-      drugName,
-      dosage,
-      frequency
-    } = req.body;
+    const { drugName, dosage, frequency } = req.body;
 
     const encounter = await Encounter.findById(encounterId);
 
@@ -414,7 +410,7 @@ practitionerRouter.post(
     const medication = {
       drugName,
       dosage,
-      frequency
+      frequency,
     };
 
     const updatedEncounter = await Encounter.findByIdAndUpdate(
@@ -441,11 +437,7 @@ practitionerRouter.post(
   asyncHandler(async (req, res) => {
     const encounterId = req.params.encounterId;
 
-    const {
-      allergen,
-      reaction,
-      severity
-    } = req.body;
+    const { allergen, reaction, severity } = req.body;
 
     const encounter = await Encounter.findById(encounterId);
 
@@ -457,7 +449,7 @@ practitionerRouter.post(
     const allergy = {
       allergen,
       reaction,
-      severity 
+      severity,
     };
 
     const updatedEncounter = await Encounter.findByIdAndUpdate(
@@ -473,6 +465,27 @@ practitionerRouter.post(
     } else {
       res.status(400);
       throw new Error("Invalid Data");
+    }
+  })
+);
+
+practitionerRouter.get(
+  "/medicalHistory/:patientId",
+  protectPractitioner,
+  asyncHandler(async (req, res) => {
+    const patientId = req.params.patientId;
+
+    const patient = await Patient.findOne({ patientId });
+
+    if (patient) {
+      const medicalHistory = await Encounter.findOne({
+        patientId: patient._id,
+      }).populate("practitionerId");
+
+      res.json(medicalHistory);
+    } else {
+      res.status(404);
+      throw new Error("Patient history not found");
     }
   })
 );
