@@ -89,12 +89,11 @@ patientRouter.get(
     if (patient) {
       patient.confirmed = true;
       const confirmedPatient = await patient.save();
-      res
-        .json({
-          message: "account verified",
-          email: confirmedPatient.email,
-        })
-        .redirect("https://integrated-care.vercel.app/auth/sign-in");
+      res.redirect("https://integrated-care.vercel.app/auth/sign-in");
+      // .json({
+      //   message: "account verified",
+      //   email: confirmedPatient.email,
+      // })
     } else {
       res.status(404);
       throw new Error("Patient not found");
