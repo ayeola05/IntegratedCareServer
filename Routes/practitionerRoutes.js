@@ -308,7 +308,8 @@ practitionerRouter.post(
     });
 
     if (encounter) {
-      res.status(201).json(encounter);
+      const newEncounter = await encounter.populate("practitionerId");
+      res.status(201).json(newEncounter);
     } else {
       res.status(400);
       throw new Error("Invalid Data");
@@ -346,7 +347,10 @@ practitionerRouter.post(
     );
 
     if (updatedEncounter) {
-      res.status(201).json(updatedEncounter);
+      const newUpdatedEncounter = await updatedEncounter.populate(
+        "practitionerId"
+      );
+      res.status(201).json(newUpdatedEncounter);
     } else {
       res.status(400);
       throw new Error("Invalid Data");
@@ -383,7 +387,10 @@ practitionerRouter.post(
     );
 
     if (updatedEncounter) {
-      res.status(201).json(updatedEncounter);
+      const newUpdatedEncounter = await updatedEncounter.populate(
+        "practitionerId"
+      );
+      res.status(201).json(newUpdatedEncounter);
     } else {
       res.status(400);
       throw new Error("Invalid Data");
@@ -422,7 +429,10 @@ practitionerRouter.post(
     );
 
     if (updatedEncounter) {
-      res.status(201).json(updatedEncounter);
+      const newUpdatedEncounter = await updatedEncounter.populate(
+        "practitionerId"
+      );
+      res.status(201).json(newUpdatedEncounter);
     } else {
       res.status(400);
       throw new Error("Invalid Data");
@@ -461,7 +471,10 @@ practitionerRouter.post(
     );
 
     if (updatedEncounter) {
-      res.status(201).json(updatedEncounter);
+      const newUpdatedEncounter = await updatedEncounter.populate(
+        "practitionerId"
+      );
+      res.status(201).json(newUpdatedEncounter);
     } else {
       res.status(400);
       throw new Error("Invalid Data");
