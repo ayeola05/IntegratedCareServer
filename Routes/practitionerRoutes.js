@@ -13,6 +13,7 @@ import Encounter from "../Models/EncounterModel.js";
 import Allergies from "../Models/AllergiesModel.js";
 import Task from "../Models/TaskModel.js";
 import Diagnosis from "../Models/DiagnosisModel.js";
+import Medication from "../Models/MedicationSchema.js";
 
 const practitionerRouter = express.Router();
 const BASE_URL = "https://integrated-server.onrender.com";
@@ -370,6 +371,55 @@ practitionerRouter.post(
   })
 );
 
+//ADD MEDICATIONS
+practitionerRouter.post(
+  "/:encounterId/addMedication/:patientId",
+  protectPractitioner,
+  isPractitioner,
+  asyncHandler(async (req, res) => {
+    const { drugName, dosage, frequency } = req.body;
+
+    const encounterId = req.params.encounterId;
+
+    const encounter = await Encounter.findById(encounterId);
+
+    if (!encounter) {
+      res.status(404);
+      throw new Error("No encounter found");
+    }
+
+    const patientId = req.params.patientId;
+
+    const patient = await Patient.findOne({ patientId });
+
+    if (!patient) {
+      res.status(404);
+      throw new Error("Patient not found");
+    }
+
+    const medication = await Medication.create({
+      drugName,
+      dosage,
+      frequency,
+      patient: patient._id,
+      practitioner: req.user._id,
+      encounter: encounter._id,
+    });
+
+    const populatedMedication = await medication.populate(
+      "practitioner",
+      "firstName lastName"
+    );
+
+    if (populatedMedication) {
+      res.status(201).json(populatedMedication);
+    } else {
+      res.status(400);
+      throw new Error("Something went wrong");
+    }
+  })
+);
+
 //ADD DIAGNOSIS
 practitionerRouter.post(
   "/:encounterId/addDiagnosis/:patientId",
@@ -476,9 +526,9 @@ practitionerRouter.get(
     const patient = await Patient.findOne({ patientId });
 
     if (patient) {
-      const medicalHistory = await Encounter.findOne({
-        patientId: patient._id,
-      }).populate("practitionerId");
+      const medicalHistory = await Encounter.find({
+        patient: patient._id,
+      }).populate("practitioner", "firstName lastName");
 
       res.json(medicalHistory);
     } else {
