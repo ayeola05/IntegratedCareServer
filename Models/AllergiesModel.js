@@ -2,15 +2,20 @@ import mongoose from "mongoose";
 
 export const AllergiesSchema = mongoose.Schema(
   {
-    patientId: {
+    patient: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "Patient",
     },
-    practitionerId: {
+    practitioner: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "Practitioner",
+    },
+    encounter: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "Encounter",
     },
     allergen: {
       type: String,
@@ -22,7 +27,7 @@ export const AllergiesSchema = mongoose.Schema(
     },
     severity: {
       type: String,
-      enum: ["moderate", "critical"],
+      enum: ["mild", "moderate", "severe"],
       required: true,
     },
   },
