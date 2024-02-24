@@ -262,7 +262,7 @@ practitionerRouter.patch(
       practitioner.firstName = req.body.firstName || practitioner.firstName;
       practitioner.lastName = req.body.lastName || practitioner.lastName;
       practitioner.workAddress =
-        req.body.workAddress || practitioneupdatedEncounterr.workAddress;
+        req.body.workAddress || practitioner.workAddress;
       practitioner.workPhoneNumber =
         req.body.workPhoneNumber || practitioner.workPhoneNumber;
       practitioner.email = req.body.email || practitioner.email;
