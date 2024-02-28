@@ -12,11 +12,11 @@ export const TaskSchema = mongoose.Schema(
       required: true,
       ref: "Practitioner",
     },
-    encounter: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Encounter",
-    },
+    // encounter: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   required: true,
+    //   ref: "Encounter",
+    // },
     taskName: {
       type: String,
       required: true,

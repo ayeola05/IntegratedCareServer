@@ -281,65 +281,65 @@ practitionerRouter.patch(
 );
 
 //ADD AN ENCOUNTER
-practitionerRouter.post(
-  "/addEncounter/:patientId",
-  protectPractitioner,
-  isPractitioner,
-  asyncHandler(async (req, res) => {
-    const { location, reasonForVisit } = req.body;
+// practitionerRouter.post(
+//   "/addEncounter/:patientId",
+//   protectPractitioner,
+//   isPractitioner,
+//   asyncHandler(async (req, res) => {
+//     const { location, reasonForVisit } = req.body;
 
-    const patientId = req.params.patientId;
+//     const patientId = req.params.patientId;
 
-    const practitioner = await Practitioner.findById(req.user._id);
+//     const practitioner = await Practitioner.findById(req.user._id);
 
-    if (!practitioner) {
-      res.status(404);
-      throw new Error("Practitioner not found");
-    }
+//     if (!practitioner) {
+//       res.status(404);
+//       throw new Error("Practitioner not found");
+//     }
 
-    const patient = await Patient.findOne({ patientId });
+//     const patient = await Patient.findOne({ patientId });
 
-    if (!patient) {
-      res.status(404);
-      throw new Error("Patient not found");
-    }
+//     if (!patient) {
+//       res.status(404);
+//       throw new Error("Patient not found");
+//     }
 
-    const encounter = await Encounter.create({
-      patient: patient._id,
-      practitioner: practitioner._id,
-      location,
-      reasonForVisit,
-    });
+//     const encounter = await Encounter.create({
+//       patient: patient._id,
+//       practitioner: practitioner._id,
+//       location,
+//       reasonForVisit,
+//     });
 
-    if (encounter) {
-      const newEncounter = await encounter.populate(
-        "practitioner",
-        "firstName lastName"
-      );
-      res.status(201).json(newEncounter);
-    } else {
-      res.status(400);
-      throw new Error("Invalid Data");
-    }
-  })
-);
+//     if (encounter) {
+//       const newEncounter = await encounter.populate(
+//         "practitioner",
+//         "firstName lastName"
+//       );
+//       res.status(201).json(newEncounter);
+//     } else {
+//       res.status(400);
+//       throw new Error("Invalid Data");
+//     }
+//   })
+// );
 
 //ADD TASK
 practitionerRouter.post(
-  "/:encounterId/addTask/:patientId",
+  "/addTask/:patientId",
   protectPractitioner,
   isPractitioner,
   asyncHandler(async (req, res) => {
     const { taskName } = req.body;
 
-    const encounterId = req.params.encounterId;
+    // const encounterId = req.params.encounterId;
 
-    const encounter = await Encounter.findById(encounterId);
+    // const encounter = await Encounter.findById(encounterId);
 
-    if (!encounter) {
-      res.status(404);
-      throw new Error("No encounter found");
-    }
+    // if (!encounter) {
+    //   res.status(404);
+    //   throw new Error("No encounter found");
+    // }
 
     const patientId = req.params.patientId;
 
@@ -354,7 +354,7 @@ practitionerRouter.post(
       taskName,
       patient: patient._id,
       practitioner: req.user._id,
-      encounter: encounter._id,
+      // encounter: encounter._id,
     });
 
     const populatedTask = await task.populate(
@@ -373,20 +373,20 @@ practitionerRouter.post(
 
 //ADD MEDICATIONS
 practitionerRouter.post(
-  "/:encounterId/addMedication/:patientId",
+  "/addMedication/:patientId",
   protectPractitioner,
   isPractitioner,
   asyncHandler(async (req, res) => {
     const { drugName, dosage, frequency } = req.body;
 
-    const encounterId = req.params.encounterId;
+    // const encounterId = req.params.encounterId;
 
-    const encounter = await Encounter.findById(encounterId);
+    // const encounter = await Encounter.findById(encounterId);
 
-    if (!encounter) {
-      res.status(404);
-      throw new Error("No encounter found");
-    }
+    // if (!encounter) {
+    //   res.status(404);
+    //   throw new Error("No encounter found");
+    // }
 
     const patientId = req.params.patientId;
 
@@ -403,7 +403,7 @@ practitionerRouter.post(
       frequency,
       patient: patient._id,
       practitioner: req.user._id,
-      encounter: encounter._id,
+      // encounter: encounter._id,
     });
 
     const populatedMedication = await medication.populate(
@@ -422,20 +422,20 @@ practitionerRouter.post(
 
 //ADD DIAGNOSIS
 practitionerRouter.post(
-  "/:encounterId/addDiagnosis/:patientId",
+  "/addDiagnosis/:patientId",
   protectPractitioner,
   isPractitioner,
   asyncHandler(async (req, res) => {
-    const { description } = req.body;
+    const { diagnosis } = req.body;
 
-    const encounterId = req.params.encounterId;
+    // const encounterId = req.params.encounterId;
 
-    const encounter = await Encounter.findById(encounterId);
+    // const encounter = await Encounter.findById(encounterId);
 
-    if (!encounter) {
-      res.status(404);
-      throw new Error("No encounter found");
-    }
+    // if (!encounter) {
+    //   res.status(404);
+    //   throw new Error("No encounter found");
+    // }
 
     const patientId = req.params.patientId;
 
@@ -446,14 +446,14 @@ practitionerRouter.post(
       throw new Error("Patient not found");
     }
 
-    const diagnosis = await Diagnosis.create({
-      description,
+    const newDiagnosis = await Diagnosis.create({
+      diagnosis,
       patient: patient._id,
       practitioner: req.user._id,
-      encounter: encounter._id,
+      // encounter: encounter._id,
     });
 
-    const populatedDiagnosis = await diagnosis.populate(
+    const populatedDiagnosis = await newDiagnosis.populate(
       "practitioner",
       "firstName lastName"
     );
@@ -469,20 +469,20 @@ practitionerRouter.post(
 
 //ADD ALLERGY
 practitionerRouter.post(
-  "/:encounterId/addAllergy/:patientId",
+  "/addAllergy/:patientId",
   protectPractitioner,
   isPractitioner,
   asyncHandler(async (req, res) => {
     const { allergen, reaction, severity } = req.body;
 
-    const encounterId = req.params.encounterId;
+    // const encounterId = req.params.encounterId;
 
-    const encounter = await Encounter.findById(encounterId);
+    // const encounter = await Encounter.findById(encounterId);
 
-    if (!encounter) {
-      res.status(404);
-      throw new Error("No encounter found");
-    }
+    // if (!encounter) {
+    //   res.status(404);
+    //   throw new Error("No encounter found");
+    // }
 
     const patientId = req.params.patientId;
 
@@ -499,7 +499,7 @@ practitionerRouter.post(
       severity,
       patient: patient._id,
       practitioner: req.user._id,
-      encounter: encounter._id,
+      // encounter: encounter._id,
     });
 
     const populatedAllergy = await allergy.populate(
