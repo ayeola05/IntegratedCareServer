@@ -551,10 +551,14 @@ practitionerRouter.patch(
       patient.bloodType = req.body.bloodType || patient.bloodType;
       patient.genotype = req.body.genotype || patient.genotype;
 
-      const updatedPatient = await patient.save();
-      res.json(
-        updatedPatient,
-      );
+      const {patientId, gender, dob, bloodType, genotype} = await patient.save();
+      res.json({
+        patientId,
+        gender,
+        dob,
+        bloodType,
+        genotype 
+      });
     } else {
       res.status(404);
       throw new Error("Patient not found");
