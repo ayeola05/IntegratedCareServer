@@ -74,6 +74,16 @@ const patientSchema = mongoose.Schema(
       type: String,
       default: null,
     },
+    bloodType: {
+      type: String,
+      enum: ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"],
+      default: null,
+    },
+    genotype: {
+      type: String,
+      enum: ["AA", "AC", "AS", "CC", "SC", "SS"],
+      default: null,
+    },
     confirmed: {
       type: Boolean,
       default: false,

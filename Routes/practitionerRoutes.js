@@ -538,9 +538,8 @@ practitionerRouter.get(
   })
 );
 
-//GET PATIENTS ENCOUNTERS
-practitionerRouter.get(
-  "/getEncounters/:patientId",
+practitionerRouter.patch(
+  "/updateBloodData/:patientId",
   protectPractitioner,
   isPractitioner,
   asyncHandler(async (req, res) => {
@@ -548,18 +547,17 @@ practitionerRouter.get(
 
     const patient = await Patient.findOne({ patientId });
 
-    if (!patient) {
+    if (patient) {
+      patient.bloodType = req.body.bloodType || patient.bloodType;
+      patient.genotype = req.body.genotype || patient.genotype;
+
+      const updatedPatient = await patient.save();
+      res.json({
+        updatedPatient,
+      });
+    } else {
       res.status(404);
       throw new Error("Patient not found");
-    }
-
-    const patientEncounters = await Encounter.find({ patient: patient._id });
-
-    if (patientEncounters) {
-      res.json(patientEncounters);
-    } else {
-      res.status(400);
-      throw new Error("Something went wrong");
     }
   })
 );
