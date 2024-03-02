@@ -12,11 +12,11 @@ export const DiagnosisSchema = mongoose.Schema(
       required: true,
       ref: "Practitioner",
     },
-    // encounter: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   required: true,
-    //   ref: "Encounter",
-    // },
+    encounter: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "Encounter",
+    },
     diagnosis: {
       type: String,
       required: true,

@@ -182,6 +182,7 @@ patientRouter.patch(
   })
 );
 
+//GET MEDICAL HISTORY
 patientRouter.get(
   "/medicalHistory",
   protectPatient,
