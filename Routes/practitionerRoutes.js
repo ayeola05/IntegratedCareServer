@@ -568,4 +568,38 @@ practitionerRouter.patch(
   })
 );
 
+//GET ENCOUNTER DETAILS
+practitionerRouter.get(
+  "/getEncounterDetails/:encounterId",
+  protectPractitioner,
+  isPractitioner,
+  asyncHandler(async (req, res) => {
+
+    const encounterId = req.params.encounterId;
+
+    const encounter = await Encounter.findById(encounterId);
+
+    if (!encounter) {
+      res.status(404);
+      throw new Error("No encounter found");
+    }
+
+    const allergies = await Allergies.find({encounter: encounter._id})
+
+    const diagnosis = await Diagnosis.find({encounter: encounter._id})
+
+    const medications = await Medication.find({encounter: encounter._id})
+
+    const tasks = await Task.find({encounter: encounter._id})
+
+    res.json({
+      allergies,
+      diagnosis,
+      medications,
+      tasks
+    })
+
+  })
+)
+
 export default practitionerRouter;
