@@ -120,6 +120,8 @@ practitionerRouter.get(
         firstName: patient.firstName,
         lastName: patient.lastName,
         email: patient.email,
+        bloodType: patient.bloodType,
+        genotype: patient.genotype
       });
     } else {
       res.status(400);
@@ -584,13 +586,16 @@ practitionerRouter.get(
       throw new Error("No encounter found");
     }
 
-    const allergies = await Allergies.find({encounter: encounter._id})
+    const allergies = await Allergies.find({encounter: encounter._id}).populate("practitioner", "firstName lastName")
 
-    const diagnosis = await Diagnosis.find({encounter: encounter._id})
+    const diagnosis = await Diagnosis.find({encounter: encounter._id}).populate("practitioner", "firstName lastName")
 
-    const medications = await Medication.find({encounter: encounter._id})
 
-    const tasks = await Task.find({encounter: encounter._id})
+    const medications = await Medication.find({encounter: encounter._id}).populate("practitioner", "firstName lastName")
+
+
+    const tasks = await Task.find({encounter: encounter._id}).populate("practitioner", "firstName lastName")
+
 
     res.json({
       allergies,
