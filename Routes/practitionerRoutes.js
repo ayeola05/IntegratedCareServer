@@ -570,13 +570,12 @@ practitionerRouter.patch(
   })
 );
 
-//GET ENCOUNTER DETAILS
+//GET ALLERGIES BASED ON AN ENCOUNTER
 practitionerRouter.get(
-  "/getEncounterDetails/:encounterId",
+  "/getAllergies/:encounterId",
   protectPractitioner,
   isPractitioner,
   asyncHandler(async (req, res) => {
-
     const encounterId = req.params.encounterId;
 
     const encounter = await Encounter.findById(encounterId);
@@ -588,22 +587,72 @@ practitionerRouter.get(
 
     const allergies = await Allergies.find({encounter: encounter._id}).populate("practitioner", "firstName lastName")
 
+    res.json(allergies)
+
+  })
+)
+
+//GET DIAGNOSIS BASED ON AN ENCOUNTER
+practitionerRouter.get(
+  "/getDiagnosis/:encounterId",
+  protectPractitioner,
+  isPractitioner,
+  asyncHandler(async (req, res) => {
+    const encounterId = req.params.encounterId;
+
+    const encounter = await Encounter.findById(encounterId);
+
+    if (!encounter) {
+      res.status(404);
+      throw new Error("No encounter found");
+    }
+    
     const diagnosis = await Diagnosis.find({encounter: encounter._id}).populate("practitioner", "firstName lastName")
 
+    res.json(diagnosis)
 
+  })
+)
+
+//GET MEDICATIONS BASED ON AN ENCOUNTER
+practitionerRouter.get(
+  "/getMedications/:encounterId",
+  protectPractitioner,
+  isPractitioner,
+  asyncHandler(async (req, res) => {
+    const encounterId = req.params.encounterId;
+
+    const encounter = await Encounter.findById(encounterId);
+
+    if (!encounter) {
+      res.status(404);
+      throw new Error("No encounter found");
+    }
+    
     const medications = await Medication.find({encounter: encounter._id}).populate("practitioner", "firstName lastName")
 
+    res.json(medications)
+  })
+)
 
+//GET TASKS BASED ON AN ENCOUNTER
+practitionerRouter.get(
+  "/getTasks/:encounterId",
+  protectPractitioner,
+  isPractitioner,
+  asyncHandler(async (req, res) => {
+    const encounterId = req.params.encounterId;
+
+    const encounter = await Encounter.findById(encounterId);
+
+    if (!encounter) {
+      res.status(404);
+      throw new Error("No encounter found");
+    }
+    
     const tasks = await Task.find({encounter: encounter._id}).populate("practitioner", "firstName lastName")
 
-
-    res.json({
-      allergies,
-      diagnosis,
-      medications,
-      tasks
-    })
-
+    res.json(tasks)
   })
 )
 
