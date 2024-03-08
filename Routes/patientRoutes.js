@@ -7,6 +7,10 @@ import { protectPatient } from "../Middleware /AuthMiddleware.js";
 import mailer from "../config/EmailService.js";
 import jwt from "jsonwebtoken";
 import Encounter from "../Models/EncounterModel.js";
+import Allergies from "../Models/AllergiesModel.js";
+import Diagnosis from "../Models/DiagnosisModel.js";
+import Medication from "../Models/MedicationSchema.js";
+import Task from "../Models/TaskModel.js";
 
 const patientRouter = express.Router();
 
@@ -191,8 +195,8 @@ patientRouter.get(
 
     if (patient) {
       const medicalHistory = await Encounter.find({
-        patientId: patient._id,
-      }).populate("practitionerId");
+        patient: patient._id,
+      }).populate("practitioner", "firstName lastName");
 
       res.json(medicalHistory);
     } else {
@@ -201,5 +205,89 @@ patientRouter.get(
     }
   })
 );
+
+//GET ALLERGIES
+patientRouter.get(
+  "/getAllergies/:encounterId",
+  protectPatient,
+  asyncHandler(async (req, res) => {
+    const encounterId = req.params.encounterId;
+
+    const encounter = await Encounter.findById(encounterId);
+
+    if (!encounter) {
+      res.status(404);
+      throw new Error("No encounter found");
+    }
+
+    const allergies = await Allergies.find({encounter: encounter._id}).populate("practitioner", "firstName lastName")
+
+    res.json(allergies)
+
+  })
+)
+
+//GET DIAGNOSIS
+patientRouter.get(
+  "/getDiagnosis/:encounterId",
+  protectPatient,
+  asyncHandler(async (req, res) => {
+    const encounterId = req.params.encounterId;
+
+    const encounter = await Encounter.findById(encounterId);
+
+    if (!encounter) {
+      res.status(404);
+      throw new Error("No encounter found");
+    }
+
+    const diagnosis = await Diagnosis.find({encounter: encounter._id}).populate("practitioner", "firstName lastName")
+
+    res.json(diagnosis)
+
+  })
+)
+
+//GET MEDICATIONS
+patientRouter.get(
+  "/getMedications/:encounterId",
+  protectPatient,
+  asyncHandler(async (req, res) => {
+    const encounterId = req.params.encounterId;
+
+    const encounter = await Encounter.findById(encounterId);
+
+    if (!encounter) {
+      res.status(404);
+      throw new Error("No encounter found");
+    }
+
+    const medications = await Medication.find({encounter: encounter._id}).populate("practitioner", "firstName lastName")
+
+    res.json(medications)
+
+  })
+)
+
+//GET TASKS
+patientRouter.get(
+  "/getTasks/:encounterId",
+  protectPatient,
+  asyncHandler(async (req, res) => {
+    const encounterId = req.params.encounterId;
+
+    const encounter = await Encounter.findById(encounterId);
+
+    if (!encounter) {
+      res.status(404);
+      throw new Error("No encounter found");
+    }
+
+    const tasks = await Task.find({encounter: encounter._id}).populate("practitioner", "firstName lastName")
+
+    res.json(tasks)
+
+  })
+)
 
 export default patientRouter;
