@@ -134,7 +134,6 @@ practitionerRouter.get(
 practitionerRouter.get(
   "/addPatient",
   protectPractitioner,
-  isPractitioner,
   asyncHandler(async (req, res) => {
     const patientId = req.query.patientId;
 
@@ -665,7 +664,7 @@ practitionerRouter.delete(
     const patientId = req.params.patientId
 
     const patient = await Patient.findOne({patientId})
-    
+
     if(patient){
       const deletedPatient = await Practitioner.findByIdAndUpdate(
         req.user._id,
