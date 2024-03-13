@@ -656,4 +656,30 @@ practitionerRouter.get(
   })
 )
 
+//REMOVE PATIENT FROM PRACTITIONER DASHBOARD
+practitionerRouter.delete(
+  "/removePatient/:patientId",
+  protectPractitioner,
+  isPractitioner,
+  asyncHandler(async (req, res) => {
+    const patientId = req.params.patientId
+
+    const patient = await Patient.findOne({patientId})
+    
+    if(patient){
+      const deletedPatient = await Practitioner.findByIdAndUpdate(
+        req.user._id,
+        {
+          $pull: {patients: patient._id},
+        },
+        { runValidators: true, new: true }
+      );
+      res.json(patient)
+    }else {
+      res.status(404)
+      throw new Error("Patient not found")
+    }
+  })
+)
+
 export default practitionerRouter;
